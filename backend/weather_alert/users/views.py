@@ -6,6 +6,9 @@ from rest_framework import status, generics, permissions
 from .models import User, Notification
 from .serializers import UserSerializer, RegisterSerializer, LoginSerializer, NotificationSerializer, UpdateUserSerializer, ChangePasswordSerializer
 from .validations import clean_data
+from dotenv import load_dotenv
+import os
+import requests
 
 
 # Create your views here.
@@ -102,6 +105,35 @@ class UserView(generics.GenericAPIView):
         return Response({
             'user': serializer.data,
             }, status=status.HTTP_200_OK)
+
+class WeatherAlertView(generics.GenericAPIView):
+    """ weather info view """
+    permissions_classes = (permissions.IsAuthenticated, )
+    authentication_classes = (SessionAuthentication, )
+
+    def get(self, request):
+        load_dotenv()
+        API_KEY = os.environ.get('API_KEY')
+        serializer = UserSerializer(request.user)
+        user_city = serializer.data['city']
+        print(API_KEY)
+        print(user_city)
+        try:
+            url = 'http://api.openweathermap.org/data/2.5/weather?q={}&units=imperial&appid=' + API_KEY
+            print(url)
+            data = requests.get(url.format(user_city)).json()
+            print(data)
+        except:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+
+
+        weather = {
+            'city': user_city,
+            'temperature': data['main']['temp'],
+            'description' : data['weather'][0]['description'],
+            'icon' : data['weather'][0]['icon']
+        }
+        return Response(weather, status=status.HTTP_200_OK)
 
 
 
