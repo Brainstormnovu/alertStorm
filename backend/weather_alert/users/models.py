@@ -57,7 +57,7 @@ class UserManager(BaseUserManager):
 # Create your models here.
 class User(AbstractBaseUser, PermissionsMixin):
     """User Model"""
-    userid = models.UUIDField(default=uuid4, editable=False, null=True, blank=True)
+    userid = models.UUIDField(default=uuid4, editable=False)
     email = models.EmailField(max_length=255, unique=True)
     password = models.CharField(max_length=255, null=False)
     date_joined = models.DateTimeField(default=timezone.now)
