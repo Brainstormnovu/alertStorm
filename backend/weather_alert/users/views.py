@@ -78,7 +78,8 @@ class UserLogin(generics.GenericAPIView):
         if serializer.is_valid(raise_exception=True):
             user = serializer.validate(data)
             login(request, user)
-            return Response(serializer.data, status=status.HTTP_200_OK)
+            usr = UserSerializer(request.user)
+            return Response(usr.data, status=status.HTTP_200_OK)
 
 
 class UserLogout(APIView):
